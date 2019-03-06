@@ -19,7 +19,15 @@ import mate_methods as mate
 generation_limit = 19
 score_min = 0.00 # terminate immediately when 100% accuracy is achieved
 
-'''
+def scoreFunction(predict, actual):
+    try:
+        acc_score = accuracy_score(actual, predict)
+        avg_f1_score = f1_score(actual, predict, average='macro')
+        return 1 - acc_score, 1 - avg_f1_score
+    except ValueError:
+        print('Malformed predictions passed in. Setting worst fitness')
+        return 1, 1 # 0 acc_score and avg f1_score b/c we want this indiv ignored
+
 # Helper to load in CIFAR-10
 def load_CIFAR_batch(filename):
     """ load single batch of cifar """
@@ -50,7 +58,7 @@ def load_CIFAR10(ROOT):
     return Xtr, Ytr, Xte, Yte
 
 
-def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=1000):
+def get_CIFAR10_data(num_training=48000, num_validation=2000, num_test=10000):
     """
     Load the CIFAR-10 dataset from disk and perform preprocessing to prepare
     it for the two-layer neural net classifier.
@@ -71,7 +79,7 @@ def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=1000):
     y_test = y_test[mask]
 
     # Normalize the data: subtract the mean image
-    mean_image = np.mean(X_train, axis=0)
+    # mean_image = np.mean(X_train, axis=0)
 
     # X_train -= mean_image
     # X_val -= mean_image
@@ -82,7 +90,7 @@ def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=1000):
     # X_val = X_val.reshape(num_validation, -1)
     # X_test = X_test.reshape(num_test, -1)
 
-    return X_train, y_train, X_val, y_val, X_test, y_test
+    return X_train / 255.0, y_train, X_val / 255.0, y_val, X_test / 255.0, y_test
 
 
 # Invoke the above function to get our data.
@@ -93,53 +101,9 @@ print('Validation data shape: ', x_val.shape)
 print('Validation labels shape: ', y_val.shape)
 print('Test data shape: ', x_test.shape)
 print('Test labels shape: ', y_test.shape)
-'''
-
-def scoreFunction(predict, actual):
-    try:
-        acc_score = accuracy_score(actual, predict)
-        avg_f1_score = f1_score(actual, predict, average='macro')
-        return 1 - acc_score, 1 - avg_f1_score
-    except ValueError:
-        print('Malformed predictions passed in. Setting worst fitness')
-        return 1, 1 # 0 acc_score and avg f1_score b/c we want this indiv ignored
-
-# play with difference sizes, and different distribution
-
-mnist = tf.keras.datasets.mnist
-(x_train, y_train),(x_test, y_test) = mnist.load_data()
-x_train, x_test = x_train / 255.0, x_test / 255.0
-
-
-print(x_train.shape[0])
-# val_size = int(0.1 * x_train.shape[0]) # percentage of training data
-val_size = 5600 # exact value done so that x_train has a size multiple of batch_size
-print(val_size)
-val_ind = np.random.choice(a=np.arange(x_train.shape[0]), size=val_size, \
-    replace=False)
-val_mask = np.zeros(x_train.shape[0], dtype=bool)
-val_mask[val_ind] = True
-
-x_train = x_train.reshape(-1, 28, 28, 1)
-x_test = x_test.reshape(-1, 28, 28, 1)
-
-x_val = x_train[val_mask]
-y_val = y_train[val_mask]
-
-x_train = x_train[~val_mask]
-y_train = y_train[~val_mask]
 
 x_train = [x_train]
 x_test = [x_test]
-
-
-
-print('Train: X: {} y: {}'.format(x_train[0].shape, y_train.shape))
-print('Validation: X: {} y: {}'.format(x_val.shape, y_val.shape))
-print('Test: X: {} y: {}'.format(x_test[0].shape, y_test.shape))
-
-# print('Loaded MNIST dataset. x_train: {} y_train: {} x_test: {} y_test: {}'
-#     .format(x_train.shape, y_train.shape, x_test.shape, y_test.shape))
 
 # NOTE: a lot of this is hastily developed and I do hope to improve the 'initialization'
 #structure of the genome; please note your own ideas and we'll make that a 'project' on github soon
@@ -184,7 +148,7 @@ skeleton_block = { #this skeleton defines a SINGLE BLOCK of a genome
     'operator_dict': operators.operDict, #further defines what datatypes what arguments are required for each primitive
     'block_input_dtypes': [tf.Tensor], #placeholder datatypes so that the genome can be built off datatypes instead of real data
     'block_outputs_dtypes': [tf.Tensor],
-    'block_main_count': 15, #10 genes
+    'block_main_count': 10, #10 genes
     'block_arg_count': 2, #not used...no primitives require arguments
     'block_mut_prob': 1, #mutate genome with probability 1...always
     'block_mate_prob': 0 #mate with probability 0...never
