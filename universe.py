@@ -8,6 +8,8 @@ import queue
 import matplotlib.pyplot as plt
 import time
 from pathlib import Path
+import os
+
 
 # my scripts
 from individual import Individual
@@ -82,7 +84,7 @@ def run_universe(population, num_mutants, num_offspring, input_data, labels, blo
     return population #, eval_queue
 
 
-def create_universe(input_data, labels, population_size=1, universe_seed=9, num_mutants=4, num_offpsring=2):
+def create_universe(input_data, labels, population_size=5, universe_seed=9, num_mutants=4, num_offpsring=2):
     np.random.seed(universe_seed)
 
     # initialize the population
@@ -106,17 +108,18 @@ def create_universe(input_data, labels, population_size=1, universe_seed=9, num_
     GENERATION_LIMIT = problem.generation_limit #199
     SCORE_MIN = problem.score_min #1e-1
     start_time = time.time()
+    newpath = r'outputs_cifar/'
+    if not os.path.exists(newpath):
+        os.makedirs(newpath)
+    file_generation = 'outputs_cifar/generation_number.npy'
     while (not converged) & (generation<=GENERATION_LIMIT):
         generation += 1
         population = run_universe(population, num_mutants, num_offpsring, input_data, labels)
         scores = []
-        # print('printing genome_outputs')
         for individual in population:
             scores.append(individual.fitness.values[0])
-            # print(individual.fitness.values)
         print("-------------RAN UNIVERSE FOR GENERATION: {}-----------".format(generation + 1))
         print(generation, np.min(scores))
-        # print(scores)
         if np.min(scores) < SCORE_MIN:
             converged = True
         else:
@@ -127,21 +130,11 @@ def create_universe(input_data, labels, population_size=1, universe_seed=9, num_
             sample_best = population[np.random.choice(a=np.where(np.min(scores)==scores)[0], size=1)[0]]
             try:
                 print(sample_best.genome_outputs[0])
-                #sample_best = population[np.where(np.min(scores)==scores)[0][0]]
-                # print(problem.x_train)
-                # print(sample_best.genome_outputs)
-                # plt.figure()
-                # plt.plot(problem.x_train[1], problem.y_train, '.')
-                # #testY = solutions[run].testEvaluate()
-                # plt.plot(problem.x_train[1], sample_best.genome_outputs[0], '.')
-                # #plt.legend(['Weibull','Test Model Fit'])
-                # plt.legend(['log(x)','Test Model Fit'])
-                # #plt.show()
-                # Path('outputs').mkdir(parents=True, exist_ok=True) #should help work on all OS
-                # filepath = 'outputs/seed%i_gen%i.png' % (universe_seed, generation)
-                # plt.savefig(filepath)
-                # plt.close()
             except:
                 import pdb
                 pdb.set_trace()
+        file_pop = 'outputs_cifar/gen%i_pop.npy' % (generation)
+        np.save(file_pop, population)
+        np.save(file_generation, generation)
+
     print("ending universe", time.time()-start_time)
