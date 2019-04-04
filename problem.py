@@ -9,6 +9,9 @@ import os
 import six
 from six.moves import cPickle as pickle
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
 import operators
 import arguments
@@ -19,6 +22,64 @@ import mate_methods as mate
 generation_limit = 19
 score_min = 0.00 # terminate immediately when 100% accuracy is achieved
 
+
+
+# Helper to load in Housing Dataset
+"""Returns X_train, y_train, X_test, y_test except the features have been scalled and the target values have been binned"""
+def split_and_normalize(X_raw, y_raw):
+    # 75% train, 15% test, 15% val
+    X_train, X_test, y_train, y_test = \
+        train_test_split(X_raw, y_raw, test_size=0.30)
+
+    # reshaping because there's only one feature (price)
+    y_train = y_train.reshape(-1,1)
+    y_test = y_test.reshape(-1,1)
+    
+    scaler = StandardScaler()
+    scaler.fit(X_train)
+    
+    X_train_norm = scaler.transform(X_train)
+    X_test_norm = scaler.transform(X_test)
+
+    scaler2 = StandardScaler()
+    scaler2.fit(y_train) 
+
+    y_train_norm = scaler2.transform(y_train)
+    y_test_norm = scaler2.transform(y_test)
+    
+    return X_train_norm, y_train_norm, X_test_norm, y_test_norm
+
+def load_housing():
+    #Split the data into features, X,  and predictions, y
+    raw_data = pd.read_csv('housing_dataset/kc_house_data.csv')
+    raw_data.dropna(inplace = True) #drops rows with Nans
+    y = raw_data['price']
+    drop_features = ["id","date", "price", "zipcode", "yr_renovated"]
+    X_raw = raw_data.drop(drop_features, axis = 1)
+    X = X_raw.values
+    y = y.values # prices
+
+    X_train, y_train, X_test, y_test = split_and_normalize(X, y)
+
+    validation_index = int(len(X_test)/2)
+    
+    # Subsample the testing data (split) to validation and test
+    X_val = X_test[:validation_index]
+    y_val = y_test[:validation_index]
+    X_test = X_test[:validation_index]
+    y_test = y_test[:validation_index]
+    
+    features = X_raw.columns
+    return X_train, y_train, X_val, y_val, X_test, y_test
+
+# total entries is 21613 in housing dataset
+X_train, y_train, X_val, y_val, X_test, y_test = load_housing()
+print("Training shapes: ", X_train.shape, y_train.shape)
+print("Validation shapes: ", X_val.shape, y_val.shape)
+print("Test shapes: ", X_test.shape, y_test.shape)
+print("Total amount of data preprocessed: ", \
+      X_train.shape[0] + X_val.shape[0] + X_test.shape[0])
+exit()
 
 # Helper to load in CIFAR-10
 def load_CIFAR_batch(filename):
@@ -99,7 +160,6 @@ print('Validation labels shape: ', y_val.shape)
 print('Test data shape: ', x_test.shape)
 print('Test labels shape: ', y_test.shape)
 
-
 def scoreFunction(predict, actual):
     try:
         acc_score = accuracy_score(actual, predict)
@@ -163,13 +223,13 @@ skeleton_block = { #this skeleton defines a SINGLE BLOCK of a genome
         #operators.sub_tensors: {'prob': 1},
         #operators.mult_tensors: {'prob': 1},
         operators.dense_layer: {'prob': 1},
-        operators.conv_layer: {'prob': 1},
-        operators.max_pool_layer: {'prob': 1},
-        operators.avg_pool_layer: {'prob': 1},
-        operators.concat_func: {'prob': 1},
+        #operators.conv_layer: {'prob': 1},
+        #operators.max_pool_layer: {'prob': 1},
+        #operators.avg_pool_layer: {'prob': 1},
+        #operators.concat_func: {'prob': 1},
         # operators.sum_func: {'prob': 1},
-        operators.conv_block: {'prob': 1},
-        operators.res_block: {'prob': 1},
+        #operators.conv_block: {'prob': 1},
+        #operators.res_block: {'prob': 1},
         #operators.sqeeze_excitation_block: {'prob': 1},
         #operators.identity_block: {'prob': 1},
     },
