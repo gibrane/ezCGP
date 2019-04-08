@@ -80,6 +80,10 @@ print("Test shapes: ", x_test.shape, y_test.shape)
 print("Total amount of data preprocessed: ", \
      x_train.shape[0] + x_val.shape[0] + x_test.shape[0])
 
+
+x_train = np.array([x_train]) #this is so blocks.py does not break
+x_test = np.array([x_test])
+
 # Regression Score Function
 def scoreFunction(predict, actual):
     try:
