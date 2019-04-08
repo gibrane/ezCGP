@@ -87,6 +87,8 @@ x_test = np.array([x_test])
 # Regression Score Function
 def scoreFunction(predict, actual):
     try:
+        # think about outliers or data error, so try to avoid min/max, etc.
+        # be conscious of the dataset
         mae = mean_absolute_error(actual, predict)
         mse = mean_squared_error(actual, predict)
         return mae, mse # to minimize
