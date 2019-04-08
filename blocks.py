@@ -199,6 +199,7 @@ class Block(Mate, Mutate):
                             feed_dict=feed_dict)
 
                         tf_output_dict = tf_outputs[0]
+                        #print(tf_outputs)
                         step_loss = tf_output_dict['loss']
                         # print("epoch: {} loaded batch index: {}. Fed {}/{} samples. Step loss: {}"\
                         #        .format(epoch, step, step * batch_size, self._num_examples, step_loss))
@@ -267,7 +268,9 @@ class Block(Mate, Mutate):
         else:
             print('block_input: {}'.format(np.array(block_inputs).shape))
             data_pair = {}
+            #print(block_inputs)
             for i, input_ in enumerate(block_inputs): #self.genome_input_dtypes):
+            #    print(i, input_)
                 if self.tensorblock_flag:
 #                    self.evaluated[-1*(i+1)] = input_
                 #    print("self.evaluated: ", self.evaluated)
@@ -338,25 +341,27 @@ class Block(Mate, Mutate):
                             # flatten input matrix to meet NN output size (numinstances, numclasses)
                             flattened = tf.layers.Flatten()(self.evaluated[self[output_node]])
                         #    print(flattened)
-                            labels = tf.placeholder(tf.int32, [None], name='y_batch')
-                            logits = tf.layers.dense(inputs=flattened, units=self.num_classes) # logits layer
-                            loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
-                                                        logits = logits,
-                                                        labels = tf.one_hot(indices=labels, depth=self.num_classes, dtype=tf.float32)))
+                           # labels = tf.placeholder(tf.float32, [None], name='y_batch')
+                            output = tf.layers.dense(inputs=flattened, units=1) # logits layer
+                            ys = tf.placeholder("float", name = 'y_batch')
+                            # loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
+                            #                             logits = logits,
+                            #                             labels = tf.one_hot(indices=labels, depth=self.num_classes, dtype=tf.float32)))
+                            loss = tf.reduce_mean(tf.square(output-ys))
                             # predictions = tf.nn.softmax(logits=logits)
                             # or tf.losses.sparse_softmax_cross_entropy ...didn't put a lot of thought in this really
                             tf.summary.tensor_summary("loss", loss)
                             self.evaluated[output_node] = {
-                                "classes": tf.argmax(input=logits, axis=1),
-                                "probabilities": tf.nn.softmax(logits),
+                                "classes": output,
+                                # "probabilities": tf.nn.softmax(logits),
                                 "loss": loss}
                             self.fetch_nodes.append(self.evaluated[output_node])
-                            tf.summary.tensor_summary("classes", self.evaluated[output_node]["classes"])
-                            tf.summary.tensor_summary("probabilities", self.evaluated[output_node]["probabilities"])
+                            #tf.summary.tensor_summary("classes", self.evaluated[output_node]["classes"])
+                            #tf.summary.tensor_summary("probabilities", self.evaluated[output_node]["probabilities"])
                         optimizer = tf.train.AdamOptimizer() # TODO add optimizer into 'arguments' to and apply GA to it for mutate + mate
                         step = tf.Variable(0, name='backprop_steps', trainable=False)
                         train_step = optimizer.minimize(loss, global_step=step) #global_step)
-                        #tf.summary.scalar('loss', loss)
+                        tf.summary.scalar('loss', loss)
                         #tf.summary.scalar('logits', logits)
                         #tf.summary.scalar('results', results)
                         merged_summary = tf.summary.merge_all()
