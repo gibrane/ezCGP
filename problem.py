@@ -73,12 +73,12 @@ def load_housing():
     return X_train, y_train, X_val, y_val, X_test, y_test
 
 # total entries is 21613 in housing dataset
-X_train, y_train, X_val, y_val, X_test, y_test = load_housing()
-print("Training shapes: ", X_train.shape, y_train.shape)
-print("Validation shapes: ", X_val.shape, y_val.shape)
-print("Test shapes: ", X_test.shape, y_test.shape)
+x_train, y_train, x_val, y_val, x_test, y_test = load_housing()
+print("Training shapes: ", x_train.shape, y_train.shape)
+print("Validation shapes: ", x_val.shape, y_val.shape)
+print("Test shapes: ", x_test.shape, y_test.shape)
 print("Total amount of data preprocessed: ", \
-      X_train.shape[0] + X_val.shape[0] + X_test.shape[0])
+     x_train.shape[0] + x_val.shape[0] + x_test.shape[0])
 
 # Regression Score Function
 def scoreFunction(predict, actual):
@@ -92,9 +92,9 @@ def scoreFunction(predict, actual):
         # not just 1,1 because some mse/mae can be > 1 
         return math.inf, math.inf # infinite error for truly terrible individuals
 
-print('Train: X: {} y: {}'.format(x_train[0].shape, y_train.shape))
-print('Validation: X: {} y: {}'.format(x_val.shape, y_val.shape))
-print('Test: X: {} y: {}'.format(x_test[0].shape, y_test.shape))
+#print('Train: X: {} y: {}'.format(x_train[0].shape, y_train.shape))
+#print('Validation: X: {} y: {}'.format(x_val.shape, y_val.shape))
+#print('Test: X: {} y: {}'.format(x_test[0].shape, y_test.shape))
 
 # NOTE: a lot of this is hastily developed and I do hope to improve the 'initialization'
 #structure of the genome; please note your own ideas and we'll make that a 'project' on github soon
