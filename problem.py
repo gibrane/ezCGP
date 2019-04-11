@@ -24,6 +24,9 @@ import mate_methods as mate
 generation_limit = 19
 score_min = 0.00 # terminate immediately when 100% accuracy is achieved
 
+# 'regression' vs. 'classification' flag
+flag = 'regression'
+
 # Helper to load in Housing Dataset
 """Returns X_train, y_train, X_test, y_test except the features have been scalled and the target values have been binned"""
 def split_and_normalize(X_raw, y_raw):
@@ -34,19 +37,19 @@ def split_and_normalize(X_raw, y_raw):
     # reshaping because there's only one feature (price)
     y_train = y_train.reshape(-1,1)
     y_test = y_test.reshape(-1,1)
-    
+
     scaler = StandardScaler()
     scaler.fit(X_train)
-    
+
     X_train_norm = scaler.transform(X_train)
     X_test_norm = scaler.transform(X_test)
 
     scaler2 = StandardScaler()
-    scaler2.fit(y_train) 
+    scaler2.fit(y_train)
 
     y_train_norm = scaler2.transform(y_train)
     y_test_norm = scaler2.transform(y_test)
-    
+
     return X_train_norm, y_train_norm, X_test_norm, y_test_norm
 
 def load_housing():
@@ -62,13 +65,13 @@ def load_housing():
     X_train, y_train, X_test, y_test = split_and_normalize(X, y)
 
     validation_index = int(len(X_test)/2)
-    
+
     # Subsample the testing data (split) to validation and test
     X_val = X_test[:validation_index]
     y_val = y_test[:validation_index]
     X_test = X_test[:validation_index]
     y_test = y_test[:validation_index]
-    
+
     features = X_raw.columns
     return X_train, y_train, X_val, y_val, X_test, y_test
 
@@ -85,7 +88,13 @@ x_train = np.array([x_train]) #this is so blocks.py does not break
 x_test = np.array([x_test])
 
 # Regression Score Function
-def scoreFunction(predict, actual, 'regression'):
+def scoreFunction(predict, actual):
+    # TODO Average Pecentage Change (priority in tuple is first) - might be domain specific
+    # regression flag here and in evaluate() in blocks.py (softmax vs. dense)
+    # think about outliers or data error, so try to avoid min/max, etc.
+    # be conscious of the dataset
+
+    global flag # to make it access python's global namespace
     if flag == 'classification':
         pass
     elif flag == 'regression':

@@ -17,7 +17,7 @@ import operators
 import arguments
 
 import tensorflow as tf
-
+from problem import flag
 
 class Block(Mate, Mutate):
     """
@@ -332,6 +332,7 @@ class Block(Mate, Mutate):
                     # final touches in the graph
                     with self.graph.as_default():
                         for output_node in range(self.genome_main_count, self.genome_main_count+self.genome_output_count):
+                            global flag # to make it access python's global namespace
                             if flag == 'classification':
                                 pass
                             elif flag == 'regression':
