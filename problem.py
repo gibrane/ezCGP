@@ -85,18 +85,21 @@ x_train = np.array([x_train]) #this is so blocks.py does not break
 x_test = np.array([x_test])
 
 # Regression Score Function
-def scoreFunction(predict, actual):
-    try:
-        # think about outliers or data error, so try to avoid min/max, etc.
-        # be conscious of the dataset
-        mae = mean_absolute_error(actual, predict)
-        mse = mean_squared_error(actual, predict)
-        return mae, mse # to minimize
-    except ValueError:
-        print('Malformed predictions passed in. Setting worst fitness')
-
-        # not just 1,1 because some mse/mae can be > 1 
-        return math.inf, math.inf # infinite error for truly terrible individuals
+def scoreFunction(predict, actual, 'regression'):
+    if flag == 'classification':
+        pass
+    elif flag == 'regression':
+        try:
+            # think about outliers or data error, so try to avoid min/max, etc.
+            # be conscious of the dataset
+            mae = mean_absolute_error(actual, predict)
+            mse = mean_squared_error(actual, predict)
+            return mae, mse # to minimize
+        except ValueError:
+            print('Malformed predictions passed in. Setting worst fitness')
+            
+            # not just 1,1 because some mse/mae can be > 1 
+            return math.inf, math.inf # infinite error for truly terrible individuals
 
 #print('Train: X: {} y: {}'.format(x_train[0].shape, y_train.shape))
 #print('Validation: X: {} y: {}'.format(x_val.shape, y_val.shape))

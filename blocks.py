@@ -332,40 +332,29 @@ class Block(Mate, Mutate):
                     # final touches in the graph
                     with self.graph.as_default():
                         for output_node in range(self.genome_main_count, self.genome_main_count+self.genome_output_count):
-                            # logits = tf.layers.dense(inputs=self.evaluated[self[output_node]], units=self.num_classes) # logits layer
-                            # loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
-                            #                             logits,
-                            #                             tf.cast(labels,dtype=tf.float32)))
-                        #    print("self[output_node]:", self[output_node])
-                        #    print("self.evaluated[self[output_node]]:", self.evaluated[self[output_node]])
-                            # flatten input matrix to meet NN output size (numinstances, numclasses)
-                            flattened = tf.layers.Flatten()(self.evaluated[self[output_node]])
-                        #    print(flattened)
-                           # labels = tf.placeholder(tf.float32, [None], name='y_batch')
-                            output = tf.layers.dense(inputs=flattened, units=1) # logits layer
-                            ys = tf.placeholder("float", name = 'y_batch')
-                            # loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
-                            #                             logits = logits,
-                            #                             labels = tf.one_hot(indices=labels, depth=self.num_classes, dtype=tf.float32)))
-                            loss = tf.reduce_mean(tf.square(output-ys))
-                            # predictions = tf.nn.softmax(logits=logits)
-                            # or tf.losses.sparse_softmax_cross_entropy ...didn't put a lot of thought in this really
-                            tf.summary.tensor_summary("loss", loss)
-                            self.evaluated[output_node] = {
-                                "classes": output,
-                                # "probabilities": tf.nn.softmax(logits),
-                                "loss": loss}
-                            self.fetch_nodes.append(self.evaluated[output_node])
-                            #tf.summary.tensor_summary("classes", self.evaluated[output_node]["classes"])
-                            #tf.summary.tensor_summary("probabilities", self.evaluated[output_node]["probabilities"])
-                        optimizer = tf.train.AdamOptimizer() # TODO add optimizer into 'arguments' to and apply GA to it for mutate + mate
-                        step = tf.Variable(0, name='backprop_steps', trainable=False)
-                        train_step = optimizer.minimize(loss, global_step=step) #global_step)
-                        tf.summary.scalar('loss', loss)
-                        #tf.summary.scalar('logits', logits)
-                        #tf.summary.scalar('results', results)
-                        merged_summary = tf.summary.merge_all()
-                        # print(loss)
+                            if flag == 'classification':
+                                pass
+                            elif flag == 'regression':
+                                # flatten input matrix to meet NN output size (numinstances, numclasses)
+                                flattened = tf.layers.Flatten()(self.evaluated[self[output_node]])
+                                # labels = tf.placeholder(tf.float32, [None], name='y_batch')
+                                output = tf.layers.dense(inputs=flattened, units=1) # logits layer
+                                ys = tf.placeholder("float", name = 'y_batch')
+                                loss = tf.reduce_mean(tf.square(output-ys))
+                                # predictions = tf.nn.softmax(logits=logits)
+                                # or tf.losses.sparse_softmax_cross_entropy ...didn't put a lot of thought in this really
+                                tf.summary.tensor_summary("loss", loss)
+                                self.evaluated[output_node] = {
+                                    "classes": output,
+                                    # "probabilities": tf.nn.softmax(logits),
+                                    "loss": loss}
+                                self.fetch_nodes.append(self.evaluated[output_node])
+                                optimizer = tf.train.AdamOptimizer() # TODO add optimizer into 'arguments' to and apply GA to it for mutate + mate
+                                step = tf.Variable(0, name='backprop_steps', trainable=False)
+                                train_step = optimizer.minimize(loss, global_step=step) #global_step)
+                                tf.summary.scalar('loss', loss)
+                                merged_summary = tf.summary.merge_all()
+
                     for graph_metadata in [train_step, merged_summary]: # opportunity to add other things we would want to fetch from the graph
                         # remember, we need 'train_step' so that the optimizer is run; we don't actually need the output
                         self.fetch_nodes.append(graph_metadata)
