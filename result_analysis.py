@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from hypervolume import HyperVolume
 
 def draw_analysis():
-    root_dir = 'outputs_gibran'
+    root_dir = 'outputs_housing'
     file_generation = '{}/generation_number.npy'.format(root_dir)
     generation = np.load(file_generation)
     fitness_score_list = []
@@ -33,7 +33,7 @@ def draw_analysis():
 def draw_analysis2():
     reference_point = (1, 1)
     hv = HyperVolume(reference_point)
-    root_dir = 'outputs_normed_cifar_more_generations'
+    root_dir = 'outputs_housing'
     file_generation = '{}/generation_number.npy'.format(root_dir)
     generation = np.load(file_generation)
     accuracy_score_list = []
@@ -56,7 +56,7 @@ def draw_analysis2():
         accuracy_score_list.append(1 - sample_best.fitness.values[0])
         f1_score_list.append(1 - sample_best.fitness.values[1])
         active_nodes_list.append(len(active_nodes))
-        volumes.append(1 - hv.compute(gen_fitnesses))
+        volumes.append(1- hv.compute(gen_fitnesses))
         populations += list(population)
     plt.subplot(221)
     plt.plot(range(0, generation + 1), accuracy_score_list, linestyle='--', marker='o', color = 'black')

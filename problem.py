@@ -24,6 +24,9 @@ import mate_methods as mate
 generation_limit = 19
 score_min = 0.00 # terminate immediately when 100% accuracy is achieved
 
+# 'regression' vs. 'classification' flag
+flag = 'regression'
+
 # Helper to load in Housing Dataset
 """Returns X_train, y_train, X_test, y_test except the features have been scalled and the target values have been binned"""
 def split_and_normalize(X_raw, y_raw):
