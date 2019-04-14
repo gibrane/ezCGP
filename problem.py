@@ -84,6 +84,14 @@ print("Total amount of data preprocessed: ", \
 x_train = np.array([x_train]) #this is so blocks.py does not break
 x_test = np.array([x_test])
 
+
+def average_percentage_change(actual, predict):
+    pChanges = []
+    for a, p, in zip(actual, predict):
+        pChanges.append(np.abs((a - p)/a))
+    return np.mean(pChanges)
+
+
 # Regression Score Function
 def scoreFunction(predict, actual):
     try:
@@ -91,9 +99,10 @@ def scoreFunction(predict, actual):
         # regression flag here and in evaluate() in blocks.py (softmax vs. dense)
         # think about outliers or data error, so try to avoid min/max, etc.
         # be conscious of the dataset
+        apc = average_percentage_change(actual, predict)
         mae = mean_absolute_error(actual, predict)
-        mse = mean_squared_error(actual, predict)
-        return mae, mse # to minimize
+        #mse = mean_squared_error(actual, predict)
+        return mae, apc # to minimize
     except ValueError:
         print('Malformed predictions passed in. Setting worst fitness')
 
