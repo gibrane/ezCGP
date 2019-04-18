@@ -1,11 +1,13 @@
 import numpy as np
 import os
-try:
+from sys import platform
+if platform == 'darwin':
     # MacOS
     import matplotlib
-    matplotlib.use("TkAgg")
+    matplotlib.use("Qt5Agg") # make sure to install pip3 install Qt5Agg to get the graph for MacOS
     from matplotlib import pyplot as plt
-except:
+else:
+    # Linux or Windows
     from matplotlib import pyplot as plt
 from hypervolume import HyperVolume
 from deap import tools
@@ -91,8 +93,8 @@ def draw_analysis2():
     plt.subplot(221)
     plt.plot(range(0, generation + 1), accuracy_score_list, linestyle='--', marker='o', color = 'black')
     # plt.legend(['accuracy_score'])
-    plt.title('Accuracy over generations')
-    plt.ylabel('Accuracy')
+    plt.title('APC over generations')
+    plt.ylabel('APC')
     plt.xlabel('Generations')
     plt.subplot(222)
     plt.plot(range(0, generation + 1), active_nodes_list, linestyle='--', marker='o', color = 'r')
