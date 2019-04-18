@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import matplotlib
-matplotlib.use("Qt5Agg")
+matplotlib.use("Qt5Agg") # make sure to install pip3 install Qt5Agg to get the graph
 from matplotlib import pyplot as plt
 from hypervolume import HyperVolume
 from deap import tools
