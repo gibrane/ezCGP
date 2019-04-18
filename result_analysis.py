@@ -1,6 +1,8 @@
 import numpy as np
 import os
-import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib import pyplot as plt
 from hypervolume import HyperVolume
 
 def draw_analysis():
