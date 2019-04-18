@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import matplotlib
-matplotlib.use("TkAgg")
+matplotlib.use("Qt5Agg")
 from matplotlib import pyplot as plt
 from hypervolume import HyperVolume
 from deap import tools
