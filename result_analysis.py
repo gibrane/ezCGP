@@ -1,8 +1,12 @@
 import numpy as np
 import os
-import matplotlib
-matplotlib.use("TkAgg")
-from matplotlib import pyplot as plt
+try:
+    # MacOS
+    import matplotlib
+    matplotlib.use("TkAgg")
+    from matplotlib import pyplot as plt
+except:
+    from matplotlib import pyplot as plt
 from hypervolume import HyperVolume
 from deap import tools
 
@@ -45,8 +49,7 @@ def draw_analysis2():
     active_nodes_list = []
     volumes = []
     populations = []
-    pareto1 = []
-    pareto2 = []
+    pareto = []
     for gen in range(0, generation+1):
         gen_fitnesses = []
         file_pop = '{}/gen{}_pop.npy'.format(root_dir, gen)
@@ -79,9 +82,12 @@ def draw_analysis2():
             if (population[j].fitness.values[0] < curr1 and population[j].fitness.values[1] < curr2):
                 found = True
         if found == False:
-            pareto1.append(curr1)
-            pareto2.append(curr2)
+            pareto.append((curr1, curr2))
+            #pareto2.append(curr2)
         found = False
+    pareto = sorted(pareto, key=lambda x: x[0])
+    pareto1 = [x[0] for x in pareto]
+    pareto2 = [x[1] for x in pareto]
     plt.subplot(221)
     plt.plot(range(0, generation + 1), accuracy_score_list, linestyle='--', marker='o', color = 'black')
     # plt.legend(['accuracy_score'])
@@ -102,7 +108,7 @@ def draw_analysis2():
     plt.ylabel('HyperVolume')
     plt.xlabel('Generations')
     plt.subplot(224)
-    plt.plot(pareto1, pareto2, linestyle='None', marker='o', color = 'black')
+    plt.plot(pareto1, pareto2, drawstyle='steps-pre', marker='o', color = 'black')
     # plt.legend(['hyper volume over generations'])
     plt.title('Pareto Optimality Gen 19')
     plt.ylabel('APC')
