@@ -29,7 +29,7 @@ score_min = 0.00 # terminate immediately when 100% accuracy is achieved
 def split_and_normalize(X_raw, y_raw):
     # 75% train, 15% test, 15% val
     X_train, X_test, y_train, y_test = \
-        train_test_split(X_raw, y_raw, test_size=0.30)
+        train_test_split(X_raw, y_raw, test_size=0.30, random_state = 42)
 
     # reshaping because there's only one feature (price)
     y_train = y_train.reshape(-1,1)
@@ -47,7 +47,7 @@ def split_and_normalize(X_raw, y_raw):
     y_train_norm = scaler2.transform(y_train)
     y_test_norm = scaler2.transform(y_test)
 
-    return X_train_norm, y_train_norm, X_test_norm, y_test_norm
+    return X_train_norm, y_train_norm, X_test_norm, y_test_norm, scaler, scaler2
 
 def load_housing():
     #Split the data into features, X,  and predictions, y
@@ -59,7 +59,7 @@ def load_housing():
     X = X_raw.values
     y = y.values # prices
 
-    X_train, y_train, X_test, y_test = split_and_normalize(X, y)
+    X_train, y_train, X_test, y_test, scalerX, scalerY = split_and_normalize(X, y)
 
     validation_index = int(len(X_test)/2)
 
@@ -70,10 +70,10 @@ def load_housing():
     y_test = y_test[:validation_index]
 
     features = X_raw.columns
-    return X_train, y_train, X_val, y_val, X_test, y_test
+    return X_train, y_train, X_val, y_val, X_test, y_test, scalerX, scalerY
 
 # total entries is 21613 in housing dataset
-x_train, y_train, x_val, y_val, x_test, y_test = load_housing()
+x_train, y_train, x_val, y_val, x_test, y_test, scalerX, scalerY = load_housing()
 print("Training shapes: ", x_train.shape, y_train.shape)
 print("Validation shapes: ", x_val.shape, y_val.shape)
 print("Test shapes: ", x_test.shape, y_test.shape)
