@@ -137,6 +137,52 @@ def draw_analysis2():
     print('Best individual had fitness: {}'.format(best_ind.fitness.values))
     display_genome(best_ind)
 
+def pareto():
+    root_dir = 'outputs_housing'
+    file_generation = '{}/generation_number.npy'.format(root_dir)
+    generation = np.load(file_generation)
+    print(generation)
+    accuracy_score_list = []
+    f1_score_list = []
+    active_nodes_list = []
+    volumes = []
+    populations = []
+    pareto = []
+    for gen in range(0, generation+1):
+        gen_fitnesses = []
+        file_pop = '{}/gen{}_pop.npy'.format(root_dir, gen)
+        population = np.load(file_pop)
+        populations += list(population)
+        found = False
+        if (gen == 26):
+            for i in range(0, len(population)):
+                curr1 = population[i].fitness.values[0]
+                curr2 = population[i].fitness.values[1]
+                for j in range(0, len(population)):
+                    if (population[j].fitness.values[0] < curr1 and population[j].fitness.values[1] < curr2):
+                        found = True
+                if found == False:
+                    pareto.append((curr1, curr2))
+                    #pareto2.append(curr2)
+                found = False
+            pareto = sorted(pareto, key=lambda x: x[0])
+            pareto1 = [x[0] for x in pareto]
+            pareto2 = [x[1] for x in pareto]
+    plt.subplot(221)
+    plt.plot(pareto1, pareto2, drawstyle='steps-pre', marker='o', color = 'black')
+    # plt.legend(['hyper volume over generations'])
+    plt.title('Pareto Optimality Gen 26')
+    plt.ylabel('MAE')
+    plt.xlabel('APC')
+    plt.show()
+    all_scores = np.array([indiv.fitness.values for indiv in populations])
+    fit_acc = all_scores[:, 0]
+    fit_f1 = all_scores[:, 1]
+    best_ind = populations[fit_acc.argmin()]
+    print('Best individual had fitness: {}'.format(best_ind.fitness.values))
+    display_genome(best_ind)
+
+
 def display_genome(individual):
     print('The genome is: ')
     for i in range(1,individual.num_blocks+1):
@@ -149,4 +195,5 @@ def display_genome(individual):
             print('function at: {} is: {}'.format(active_node, fn))
 
 if __name__ == '__main__':
-    draw_analysis2()
+    #draw_analysis2()
+    pareto()
