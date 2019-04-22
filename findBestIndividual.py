@@ -2,35 +2,43 @@ import numpy as np
 import os
 import problem
 import tensorflow as tf
-import matplotlib.pyplot as plt
+from sys import platform
+if platform == 'darwin':
+    # MacOS
+    import matplotlib
+    matplotlib.use("Qt5Agg") # make sure to install pip3 install Qt5Agg to get the graph for MacOS
+    from matplotlib import pyplot as plt
+else:
+    # Linux or Windows
+    from matplotlib import pyplot as plt
 import keras
-#from hypervolume import HyperVolume
+from hypervolume import HyperVolume
 
-# root_dir = "outputs_housing"
-# file_generation = '{}/generation_number.npy'.format(root_dir)
-# generation = np.load(file_generation)
-# # fitness_score_list = []
-# # active_nodes_list = []
-# population = []
-# for gen in range(0, generation+1):
-#     file_pop = '{}/gen{}_pop.npy'.format(root_dir, gen)
-#     population += np.load(file_pop).tolist()
-# scores = []
+root_dir = "outputs_housing"
+file_generation = '{}/generation_number.npy'.format(root_dir)
+generation = np.load(file_generation)
+# fitness_score_list = []
+# active_nodes_list = []
+population = []
+for gen in range(0, generation+1):
+    file_pop = '{}/gen{}_pop.npy'.format(root_dir, gen)
+    population += np.load(file_pop).tolist()
+scores = []
 
-# for individual in population:
-#     scores.append(individual.fitness.values[0])
-# sample_best = population[np.random.choice(a=np.where(np.min(scores)==scores)[0], size=1)[0]]
+for individual in population:
+    scores.append(individual.fitness.values[0])
+sample_best = population[np.random.choice(a=np.where(np.min(scores)==scores)[0], size=1)[0]]
 
-# for i in range(1,sample_best.num_blocks+1):
-#     curr_block = sample_best.skeleton[i]["block_object"]
-#     print('curr_block isDead = ', curr_block.dead)
-#     print(curr_block.active_nodes)
-#     for active_node in curr_block.active_nodes:
-#         fn = curr_block[active_node]
-#         print(fn)
-#         print('function at: {} is: {}'.format(active_node, fn))
-# print("fitness:", sample_best.fitness.values)
-
+for i in range(1,sample_best.num_blocks+1):
+    curr_block = sample_best.skeleton[i]["block_object"]
+    print('curr_block isDead = ', curr_block.dead)
+    print(curr_block.active_nodes)
+    for active_node in curr_block.active_nodes:
+        fn = curr_block[active_node]
+        print(fn)
+        print('function at: {} is: {}'.format(active_node, fn))
+print("fitness:", sample_best.fitness.values)
+exit()
 # from keras import Sequential, optimizers, callbacks
 # from keras.layers import Dense
 
