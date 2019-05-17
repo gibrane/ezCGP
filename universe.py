@@ -66,7 +66,7 @@ def run_universe(population, num_mutants, num_offspring, input_data, labels, blo
 
     # filter population down based off fitness
     # new population done: rank individuals in population and trim down
-    #print("prep for next pop")
+    print("    EPOCH DONE")
     population, _ = selections.selNSGA2(population, k=pop_size, nd='standard')
 
     return population #, eval_queue

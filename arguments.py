@@ -21,8 +21,8 @@ def mut_uniform(value):
     if value == 0:
         return r.uniform(0,5)
     else:
-        low = value*.85
-        high = value * 1.15
+        low = value*.5
+        high = value * 1.5
         return r.uniform(low,high)
 
 def mut_normal(value):
@@ -30,7 +30,7 @@ def mut_normal(value):
         return r.normal(3, 3*.1)
     else:
         mean = value
-        sd = value * .1
+        sd = value * .5
         return r.normal(mean, sd)
 
 

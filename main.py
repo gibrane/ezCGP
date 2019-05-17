@@ -17,7 +17,7 @@ if __name__ == '__main__':
     train_labels = problem.y_train
 
     final_populations = [] # one for each universe created
-    num_universes = 1#20
+    num_universes = 20
     for i in range(num_universes):
         print("start new run %i" % i)
         converged_solution = universe.create_universe(input_data=train_data, labels=train_labels, universe_seed=seed+i, population_size=500)
